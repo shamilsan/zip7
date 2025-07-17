@@ -1,2 +1,3 @@
 # zip7
-ZIP unpacking bindings from 7z
+
+ZIP unpacking bindings from 7z.
