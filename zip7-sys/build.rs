@@ -144,6 +144,7 @@ fn build() {
 
     let mut build = cc::Build::new();
     build
+        .include(env::current_dir().unwrap())
         .files(src_files)
         .file("wrapper.cpp")
         .cpp(true)
