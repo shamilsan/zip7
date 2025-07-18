@@ -4,13 +4,24 @@ use std::ptr::{self, NonNull};
 use std::sync::{Arc, Mutex, OnceLock};
 
 use crate::error::{Result, Zip7Error};
+pub use crate::item::Zip7Item;
 
 mod error;
+mod item;
 
 static INIT: OnceLock<()> = OnceLock::new();
 
 #[derive(Debug)]
 pub struct Handle(NonNull<zip7_sys::Handle>);
+
+unsafe impl Send for Handle {}
+unsafe impl Sync for Handle {}
+
+impl Drop for Handle {
+    fn drop(&mut self) {
+        unsafe { zip7_sys::close_archive(self.0.as_ptr()) };
+    }
+}
 
 #[derive(Debug)]
 pub struct Zip7Archive {
@@ -51,5 +62,27 @@ impl Zip7Archive {
             item_index: 0,
             item_count,
         })
+    }
+
+    pub fn len(&self) -> usize {
+        self.item_count
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.item_count == 0
+    }
+}
+
+impl Iterator for &mut Zip7Archive {
+    type Item = Zip7Item;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.item_index >= self.item_count {
+            return None;
+        }
+        let index = self.item_index;
+        self.item_index += 1;
+
+        Some(Zip7Item::new(Arc::clone(&self.handle), index))
     }
 }

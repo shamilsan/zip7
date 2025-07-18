@@ -97,6 +97,83 @@ UInt32 items_count(const Handle *handle)
     return numItems;
 }
 
+bool item_is_dir(const Handle *handle, UInt32 index)
+{
+    if (!handle || !handle->in_archive)
+        return false;
+    NWindows::NCOM::CPropVariant prop;
+    handle->in_archive->GetProperty(index, kpidIsDir, &prop);
+    if (prop.vt == VT_BOOL)
+        return prop.boolVal != VARIANT_FALSE;
+    return false;
+}
+
+UInt64 item_unpacked_size(const Handle *handle, UInt32 index)
+{
+    if (!handle || !handle->in_archive)
+        return 0;
+    NWindows::NCOM::CPropVariant prop;
+    handle->in_archive->GetProperty(index, kpidSize, &prop);
+    switch (prop.vt)
+    {
+    case VT_UI8:
+        return (UInt64)prop.uhVal.QuadPart;
+    case VT_UI4:
+        return prop.ulVal;
+    case VT_UI2:
+        return prop.uiVal;
+    case VT_UI1:
+        return prop.bVal;
+    case VT_EMPTY:
+        return 0;
+    default:
+        return 0;
+    }
+}
+
+unsigned item_path_len(const Handle *handle, UInt32 index)
+{
+    if (!handle || !handle->in_archive)
+        return 0;
+    NWindows::NCOM::CPropVariant prop;
+    handle->in_archive->GetProperty(index, kpidPath, &prop);
+    if (prop.vt == VT_BSTR)
+        return MyStringLen(prop.bstrVal);
+    return 0;
+}
+
+void item_path(const Handle *handle, UInt32 index, BSTR path)
+{
+    NWindows::NCOM::CPropVariant prop;
+    handle->in_archive->GetProperty(index, kpidPath, &prop);
+    if (prop.vt == VT_BSTR)
+        MyStringCopy(path, prop.bstrVal);
+}
+
+void set_item_out_path(Handle *handle, UInt32 index, const char *path)
+{
+    if (!handle || index >= handle->items_count)
+        return;
+
+    handle->out_paths[index] = path;
+}
+
+unsigned item_out_path_len(const Handle *handle, UInt32 index)
+{
+    if (!handle || index >= handle->items_count)
+        return 0;
+
+    return handle->out_paths[index].Len();
+}
+
+void item_out_path(const Handle *handle, UInt32 index, char *path)
+{
+    if (!handle || index >= handle->items_count)
+        return;
+
+    MyStringCopy(path, handle->out_paths[index]);
+}
+
 void close_archive(Handle *handle)
 {
     if (handle)

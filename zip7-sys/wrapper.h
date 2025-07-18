@@ -14,4 +14,11 @@ struct Handle
 void init();
 LONG open_archive(const char *path, const char *password, Handle **handle);
 UInt32 items_count(const Handle *handle);
+bool item_is_dir(const Handle *handle, UInt32 index);
+UInt64 item_unpacked_size(const Handle *handle, UInt32 index);
+unsigned item_path_len(const Handle *handle, UInt32 index);
+void item_path(const Handle *handle, UInt32 index, BSTR path);
+void set_item_out_path(Handle *handle, UInt32 index, const char *path);
+unsigned item_out_path_len(const Handle *handle, UInt32 index);
+void item_out_path(const Handle *handle, UInt32 index, char *path);
 void close_archive(Handle *handle);

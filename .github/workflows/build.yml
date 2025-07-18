@@ -21,23 +21,23 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # - name: Install toolchain
-      #   uses: dtolnay/rust-toolchain@stable
+      - name: Install toolchain
+        uses: dtolnay/rust-toolchain@stable
 
-      # - name: Cache
-      #   uses: Swatinem/rust-cache@v2
+      - name: Cache
+        uses: Swatinem/rust-cache@v2
 
-      # - name: Run linter
-      #   if: github.event_name == 'pull_request'
-      #   run: cargo clippy
+      - name: Run linter
+        if: github.event_name == 'pull_request'
+        run: cargo clippy
 
-      # - name: Check format
-      #   if: github.event_name == 'pull_request'
-      #   run: cargo fmt --check
+      - name: Check format
+        if: github.event_name == 'pull_request'
+        run: cargo fmt --check
 
-      # - name: Build
-      #   run: cargo b # -r
+      - name: Build
+        run: cargo b -r
 
       - name: Run tests
         if: github.event_name == 'pull_request'
-        run: cargo t # -r
+        run: cargo t -r
