@@ -64,6 +64,19 @@ impl Zip7Archive {
         })
     }
 
+    pub fn extract(&mut self) -> Result<Vec<Zip7Item>> {
+        let code = {
+            let handle = self.handle.lock().unwrap();
+            let handle_ptr = handle.0.as_ptr();
+            unsafe { zip7_sys::extract(handle_ptr) }
+        };
+        if code != 0 {
+            return Err(code.into());
+        }
+        self.item_index = 0;
+        Ok(self.into_iter().filter_map(Into::into).collect())
+    }
+
     pub fn len(&self) -> usize {
         self.item_count
     }

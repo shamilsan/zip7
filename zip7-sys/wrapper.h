@@ -21,4 +21,5 @@ void item_path(const Handle *handle, UInt32 index, BSTR path);
 void set_item_out_path(Handle *handle, UInt32 index, const char *path);
 unsigned item_out_path_len(const Handle *handle, UInt32 index);
 void item_out_path(const Handle *handle, UInt32 index, char *path);
+LONG extract(const Handle *handle);
 void close_archive(Handle *handle);

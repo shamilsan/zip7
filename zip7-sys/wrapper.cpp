@@ -35,6 +35,93 @@ Z7_COM7F_IMF(CArchiveOpenCallback::CryptoGetTextPassword(BSTR *password))
     return StringToBstr(m_password, password);
 }
 
+class CArchiveExtractCallback Z7_final : public IArchiveExtractCallback,
+                                         public ICryptoGetTextPassword,
+                                         public CMyUnknownImp
+{
+    Z7_IFACES_IMP_UNK_2(IArchiveExtractCallback, ICryptoGetTextPassword)
+    Z7_IFACE_COM7_IMP(IProgress)
+
+public:
+    UString m_password;
+    bool m_encrypted;
+    UInt32 m_count;
+    UInt32 m_index;
+    FString *m_out_paths;
+
+    COutFileStream *m_out_stream_spec;
+    CMyComPtr<ISequentialOutStream> m_out_stream;
+
+    CArchiveExtractCallback() : m_encrypted(false),
+                                m_out_paths(nullptr),
+                                m_out_stream(nullptr)
+    {
+    }
+};
+
+Z7_COM7F_IMF(CArchiveExtractCallback::SetTotal(UInt64 /* size */))
+{
+    return S_OK;
+}
+
+Z7_COM7F_IMF(CArchiveExtractCallback::SetCompleted(const UInt64 * /* completeValue */))
+{
+    m_out_stream.Release();
+    return S_OK;
+}
+
+Z7_COM7F_IMF(CArchiveExtractCallback::GetStream(UInt32 index, ISequentialOutStream **outStream, Int32 askExtractMode))
+{
+    m_out_stream.Release();
+    *outStream = nullptr;
+
+    if (askExtractMode != NArchive::NExtract::NAskMode::kExtract)
+        return S_OK;
+
+    if (index < m_count && !m_out_paths[index].IsEmpty())
+    {
+        m_out_stream_spec = new COutFileStream;
+        CMyComPtr<IOutStream> out_stream_loc(m_out_stream_spec);
+        if (!m_out_stream_spec->Create_ALWAYS(m_out_paths[index]))
+        {
+            m_out_stream_spec->Close();
+            return E_ABORT;
+        }
+
+        CMyComPtr<ISequentialOutStream> out_stream(out_stream_loc);
+        m_out_stream = out_stream;
+        *outStream = m_out_stream.Detach();
+    }
+
+    return S_OK;
+}
+
+Z7_COM7F_IMF(CArchiveExtractCallback::PrepareOperation(Int32 /* askExtractMode */))
+{
+    return S_OK;
+}
+
+Z7_COM7F_IMF(CArchiveExtractCallback::SetOperationResult(Int32 operationResult))
+{
+    if (m_out_stream)
+    {
+        m_out_stream_spec->Close();
+    }
+    m_out_stream.Release();
+
+    if (m_encrypted && operationResult == NArchive::NExtract::NOperationResult::kDataError)
+    {
+        return NArchive::NExtract::NOperationResult::kWrongPassword;
+    }
+    return S_OK;
+}
+
+Z7_COM7F_IMF(CArchiveExtractCallback::CryptoGetTextPassword(BSTR *password))
+{
+    m_encrypted = true;
+    return StringToBstr(m_password, password);
+}
+
 void init()
 {
 }
@@ -172,6 +259,23 @@ void item_out_path(const Handle *handle, UInt32 index, char *path)
         return;
 
     MyStringCopy(path, handle->out_paths[index]);
+}
+
+LONG extract(const Handle *handle)
+{
+    if (!handle || !handle->in_archive)
+        return E_INVALIDARG;
+    auto extract_callback = new CArchiveExtractCallback();
+    extract_callback->m_password = handle->password;
+    extract_callback->m_count = handle->items_count;
+    extract_callback->m_out_paths = handle->out_paths;
+    extract_callback->m_out_stream = nullptr;
+
+    return handle->in_archive->Extract(
+        nullptr,
+        0xFFFFFFFF,
+        false,
+        CMyComPtr<IArchiveExtractCallback>(extract_callback));
 }
 
 void close_archive(Handle *handle)
