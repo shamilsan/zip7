@@ -40,4 +40,4 @@ jobs:
 
       - name: Run tests
         if: github.event_name == 'pull_request'
-        run: cargo t # -r
+        run: cargo t -- --nocapture # -r
