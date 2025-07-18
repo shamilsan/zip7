@@ -1,3 +1,5 @@
+#include <log.h>
+
 #include "wrapper.h"
 
 #include "libzip7/CPP/7zip/Archive/Zip/ZipHandler.h"
@@ -152,6 +154,7 @@ LONG open_archive(const char *path, const char *password, Handle **handle)
         in_stream,
         &max_check_start_pos,
         CMyComPtr<IArchiveOpenCallback>(open_callback));
+    LOG("Open res: " << res);
     if (res != S_OK)
     {
         close_archive(*handle);
