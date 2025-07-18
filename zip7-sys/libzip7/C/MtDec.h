@@ -36,6 +36,9 @@ SRes MtProgress_ProgressAdd(CMtProgress *p, UInt64 inSize, UInt64 outSize);
 SRes MtProgress_GetError(CMtProgress *p);
 void MtProgress_SetError(CMtProgress *p, SRes res);
 
+// Edited by shamilsan
+// struct CMtDec;
+
 typedef struct
 {
   struct CMtDec_ *mtDec;
@@ -82,7 +85,7 @@ typedef struct
 typedef struct
 {
   void (*Parse)(void *p, unsigned coderIndex, CMtDecCallbackInfo *ci);
-
+  
   // PreCode() and Code():
   // (SRes_return_result != SZ_OK) means stop decoding, no need another blocks
   SRes (*PreCode)(void *p, unsigned coderIndex);
@@ -118,7 +121,7 @@ typedef struct
 typedef struct CMtDec_
 {
   /* input variables */
-
+  
   size_t inBufSize;        /* size of input block */
   unsigned numThreadsMax;
   // size_t inBlockMax;
@@ -134,9 +137,9 @@ typedef struct CMtDec_
   IMtDecCallback2 *mtCallback;
   void *mtCallbackObject;
 
-
+  
   /* internal variables */
-
+  
   size_t allocatedBufsSize;
 
   BoolInt exitThread;
@@ -186,7 +189,7 @@ MtDec_Code() returns:
   SZ_OK - in most cases
   MY_SRes_HRESULT_FROM_WRes(WRes_error) - in case of unexpected error in threading function
 */
-
+  
 SRes MtDec_Code(CMtDec *p);
 Byte *MtDec_GetCrossBuff(CMtDec *p);
 
