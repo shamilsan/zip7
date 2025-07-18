@@ -1,0 +1,43 @@
+name: Build
+
+on:
+  pull_request:
+    branches: [master]
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+env:
+  CARGO_TERM_COLOR: always
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache
+        uses: Swatinem/rust-cache@v2
+
+      - name: Run linter
+        if: github.event_name == 'pull_request'
+        run: cargo clippy
+
+      - name: Check format
+        if: github.event_name == 'pull_request'
+        run: cargo fmt --check
+
+      - name: Build
+        run: cargo b -r
+
+      - name: Run tests
+        if: github.event_name == 'pull_request'
+        run: cargo t -r
