@@ -1,3 +1,4 @@
+#define INITGUID
 #include "libzip7/CPP/Common/MyCom.h"
 #include "libzip7/CPP/Common/StringConvert.h"
 #include "libzip7/CPP/7zip/Archive/IArchive.h"

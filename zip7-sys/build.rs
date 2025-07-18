@@ -4,13 +4,18 @@ use std::path::Path;
 const C_FILES: &[&str] = &[
     "7zCrc.c",
     "7zCrcOpt.c",
+    "7zStream.c",
     "Aes.c",
     "AesOpt.c",
     "Alloc.c",
+    "Bra.c",
     "CpuArch.c",
     "Delta.c",
+    "Lzma2Dec.c",
     "LzmaDec.c",
+    "MtDec.c",
     "Ppmd8.c",
+    "Ppmd8Dec.c",
     "Sha1.c",
     "Sha256.c",
     "Threads.c",
@@ -18,6 +23,7 @@ const C_FILES: &[&str] = &[
     "Xz.c",
     "XzCrc64.c",
     "XzCrc64Opt.c",
+    "XzDec.c",
     "ZstdDec.c",
 ];
 
@@ -38,6 +44,7 @@ const CPP_FILES: &[&str] = &[
     "7zip/Common/MethodProps.cpp",
     "7zip/Common/OutBuffer.cpp",
     "7zip/Common/ProgressUtils.cpp",
+    "7zip/Common/PropId.cpp",
     "7zip/Common/StreamObjects.cpp",
     "7zip/Common/StreamUtils.cpp",
     "7zip/Common/UniqBlocks.cpp",
@@ -61,6 +68,7 @@ const CPP_FILES: &[&str] = &[
     "Common/C_FileIO.cpp",
     "Common/IntToString.cpp",
     "Common/NewHandler.cpp",
+    "Common/MyString.cpp",
     "Common/MyVector.cpp",
     "Common/MyWindows.cpp",
     "Common/StringConvert.cpp",
@@ -131,7 +139,6 @@ fn build() {
         .files(src_files)
         .file("wrapper.cpp")
         .cpp(true)
-        .define("SHOW_DEBUG_INFO", None)
         .opt_level(3);
 
     build.compile("libzip7");

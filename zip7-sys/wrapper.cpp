@@ -2,6 +2,7 @@
 
 #include "libzip7/CPP/7zip/Archive/Zip/ZipHandler.h"
 #include "libzip7/CPP/7zip/Common/FileStreams.h"
+#include "libzip7/CPP/7zip/Common/RegisterCodec.h"
 #include "libzip7/CPP/7zip/IPassword.h"
 
 static const UInt32 MAX_ITEMS_COUNT = 10000;
@@ -106,4 +107,32 @@ void close_archive(Handle *handle)
         delete handle;
         handle = nullptr;
     }
+}
+
+// Stubs for linking
+namespace NArchive
+{
+    namespace NZip
+    {
+
+        Z7_COM7F_IMF(CHandler::UpdateItems(ISequentialOutStream *, UInt32, IArchiveUpdateCallback *))
+        {
+            return E_NOTIMPL;
+        }
+
+        Z7_COM7F_IMF(CHandler::SetProperties(const wchar_t *const *, const PROPVARIANT *, UInt32))
+        {
+            return E_NOTIMPL;
+        }
+
+        Z7_COM7F_IMF(CHandler::GetFileTimeType(UInt32 *))
+        {
+            return E_NOTIMPL;
+        }
+    }
+}
+
+extern "C" SizeT z7_BranchConvSt_X86_Dec(Byte *, SizeT, UInt32, UInt32)
+{
+    return 0;
 }
