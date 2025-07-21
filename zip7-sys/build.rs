@@ -87,6 +87,7 @@ const CPP_FILES: &[&str] = &[
 
 fn main() {
     println!("cargo:rerun-if-changed=build.rs");
+    println!("cargo:rerun-if-changed=libzip7");
     println!("cargo:rerun-if-changed=wrapper.cpp");
     println!("cargo:rerun-if-changed=wrapper.h");
 
@@ -144,6 +145,7 @@ fn build() {
 
     let mut build = cc::Build::new();
     build
+        .include(env::current_dir().unwrap())
         .files(src_files)
         .file("wrapper.cpp")
         .cpp(true)
