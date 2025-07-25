@@ -75,4 +75,8 @@ impl Zip7Item {
         unsafe { zip7_sys::set_item_out_path(handle_ptr, self.index as _, path.as_ptr()) }
         Ok(())
     }
+
+    pub fn out_path(&self) -> &Path {
+        &self.out_path
+    }
 }
