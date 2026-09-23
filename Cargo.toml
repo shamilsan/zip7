@@ -12,5 +12,5 @@ widestring = "1.2"
 zip7-sys = { version = "0.0.1", path = "./zip7-sys" }
 
 [dev-dependencies]
-rstest = "0.26"
+rstest = "0.27"
 tempfile = "3.20"
